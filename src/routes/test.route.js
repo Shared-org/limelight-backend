@@ -1,6 +1,6 @@
 const express = require("express");
 const { test } = require("../controllers/test.controller");
-const router = express.Router();
+const testRouter = express.Router();
 
 /**
  * @swagger
@@ -15,6 +15,6 @@ const router = express.Router();
 */
 
 
-router.get("/test",test);
+testRouter.get("/test",test);
 
-module.exports = router;
+module.exports = testRouter;

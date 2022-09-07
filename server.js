@@ -14,10 +14,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api", testRouter);
 
 //* TESTING DATABASE CONNECTIVITY *//
-db.sequelize
-  .authenticate()
-  .then(() => console.log("DATABASE CONNECTED..."))
-  .catch((err) => console.log("ERROR: ", err));
+// db.sequelize
+//   .authenticate()
+//   .then(() => console.log("DATABASE CONNECTED..."))
+//   .catch((err) => console.log("ERROR: ", err));
 
 // db.sequelize.sync();
 
