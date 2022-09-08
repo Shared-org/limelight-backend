@@ -1,5 +1,5 @@
 const { DataTypes, Sequelize } = require("sequelize");
-const bcrypt = require("bcrypt");
+var bcrypt = require("bcryptjs");
 
 module.exports = (sequelize, Sequelize) => {
   const User = sequelize.define(
@@ -30,7 +30,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM("Male", "Female", "Others"),
       },
       address: {
-        type: Sequelize.VARCHAR(1000),
+        type: Sequelize.STRING(1000),
       },
       city: {
         type: Sequelize.STRING,
@@ -39,6 +39,17 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ARRAY(Sequelize.STRING),
       },
     },
+    {
+      hooks: {
+        beforeCreate: async (userInfo) => {
+          if (userInfo.password) {
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(userInfo.password, salt);
+            userInfo.password = hash;
+          }
+        },
+      },
+    }
   );
 
   return User;
