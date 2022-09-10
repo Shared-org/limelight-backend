@@ -48,6 +48,13 @@ module.exports = (sequelize, Sequelize) => {
             userInfo.password = hash;
           }
         },
+        beforeUpdate: async (userInfo) => {
+          if (userInfo.password) {
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(userInfo.password, salt);
+            userInfo.password = hash;
+          }
+        },
       },
     }
   );

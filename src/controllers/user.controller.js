@@ -1,9 +1,11 @@
+const e = require("express");
 const nodemailer = require("nodemailer");
 const { sendEmail } = require("../configs/nodemailer.config");
 const db = require("../models");
 const { mailTemplate } = require("../static/mail.static");
 const { createToken } = require("../utils/createToken.util");
 const { emailFormat } = require("../utils/emailFormat.util");
+const { validateToken } = require("../utils/validateToken.util");
 
 exports.signup = async (req, res) => {
   try {
@@ -68,6 +70,39 @@ exports.forgotPassword = async (req, res) => {
           message: error,
         });
       });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const data = req.body;
+    const verify = await validateToken(data.token);
+    if (verify) {
+      const updatePassword = await db.User.update(
+        {
+          password: data.password,
+        },
+        {
+          where: {
+            email: verify.email,
+          },
+          individualHooks: true,
+        }
+      );
+      if (updatePassword) {
+        return res.status(200).json({
+          message: "password updated",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        message: "Invalid token",
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
