@@ -1,4 +1,7 @@
+const nodemailer = require("nodemailer");
+const { sendEmail } = require("../configs/nodemailer.config");
 const db = require("../models");
+const { mailTemplate } = require("../static/mail.static");
 const { createToken } = require("../utils/createToken.util");
 const { emailFormat } = require("../utils/emailFormat.util");
 
@@ -45,7 +48,29 @@ exports.signup = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({
-      message: error,
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const data = req.body;
+    const token = createToken(data.email);
+    sendEmail(data.email, token, mailTemplate)
+      .then(() => {
+        return res.status(200).json({
+          message: "Email sent",
+        });
+      })
+      .catch((error) => {
+        return res.status(400).json({
+          message: error,
+        });
+      });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
 };
