@@ -2,11 +2,9 @@ const db = require("../models");
 
 exports.getUser = async (email) => {
   try {
-    const userDetails = await db.User.findOne({ where: { email } });
+    const userDetails = await db.User.findOne({ where: { email: email } });
     if (!userDetails) {
-      return {
-        message: "user not found!!",
-      };
+      return false;
     }
     return userDetails;
   } catch (error) {
