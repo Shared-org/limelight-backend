@@ -23,12 +23,7 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const checkExistingUser = await db.User.findOne({
-      where: {
-        email: data.email,
-      },
-      attributes: ["email"],
-    });
+    const checkExistingUser = await getUser(data.email);
 
     if (checkExistingUser) {
       return res.status(200).json({
@@ -115,9 +110,8 @@ exports.resetPassword = async (req, res) => {
 
 exports.uploadProfileImage = async (req, res) => {
   try {
-    const data = req.body;
     const files = req.file;
-    if (!files && !data) {
+    if (!files) {
       return res.status(400).json({
         message: "no files/email found",
       });
@@ -134,16 +128,47 @@ exports.uploadProfileImage = async (req, res) => {
       },
       {
         where: {
-          email: data.email,
+          email: req.userEmail,
         },
       }
     );
-    const currentUser = await getUser(data.email);
+    const currentUser = await getUser(req.userEmail);
     currentUser.password = undefined;
     if (updateImageURL && currentUser) {
       return res.status(200).json({
         message: "image uploaded successfully",
         currentUser,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.updateUserInfo = async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data) {
+      return res.status(400).json({
+        message: "invalid requset",
+      });
+    }
+    const updatedUserInfo = await db.User.update(data, {
+      where: {
+        email: req.userEmail,
+      },
+    });
+    if (updatedUserInfo) {
+      return res.status(200).json({
+        message: "user info updated successfully",
+        updatedUserInfo,
+      });
+    } else {
+      return res.status(400).json({
+        message: "something went wrong while updating the userInfo",
+        updatedUserInfo,
       });
     }
   } catch (error) {
