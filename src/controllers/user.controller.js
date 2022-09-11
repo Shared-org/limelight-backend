@@ -1,7 +1,10 @@
 const e = require("express");
 const nodemailer = require("nodemailer");
+const { AWS_S3_BUCKET_NAME } = require("../configs/aws-s3.config");
 const { sendEmail } = require("../configs/nodemailer.config");
 const db = require("../models");
+const { fileUpload } = require("../services/fileUpload.service");
+const { getUser } = require("../services/getUser.service");
 const { mailTemplate } = require("../static/mail.static");
 const { createToken } = require("../utils/createToken.util");
 const { emailFormat } = require("../utils/emailFormat.util");
@@ -101,6 +104,46 @@ exports.resetPassword = async (req, res) => {
     } else {
       return res.status(400).json({
         message: "Invalid token",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    const data = req.body;
+    const files = req.file;
+    if (!files && !data) {
+      return res.status(400).json({
+        message: "no files/email found",
+      });
+    }
+    const fileUploadResults = await fileUpload(files, AWS_S3_BUCKET_NAME);
+    if (!fileUploadResults) {
+      return res.status(400).json({
+        message: "something went wrong while uploading the image",
+      });
+    }
+    const updateImageURL = await db.User.update(
+      {
+        profile_image: fileUploadResults.Location,
+      },
+      {
+        where: {
+          email: data.email,
+        },
+      }
+    );
+    const currentUser = await getUser(data.email);
+    currentUser.password = undefined;
+    if (updateImageURL && currentUser) {
+      return res.status(200).json({
+        message: "image uploaded successfully",
+        currentUser,
       });
     }
   } catch (error) {

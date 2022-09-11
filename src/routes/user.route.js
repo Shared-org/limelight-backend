@@ -1,5 +1,11 @@
 const express = require("express");
-const { signup, forgotPassword, resetPassword } = require("../controllers/user.controller");
+const {
+  signup,
+  forgotPassword,
+  resetPassword,
+  uploadProfileImage,
+} = require("../controllers/user.controller");
+const multerConfigs = require("../middlewares/multer.middleware");
 
 const userRouter = express.Router();
 
@@ -18,4 +24,6 @@ const userRouter = express.Router();
 userRouter.post("/signup", signup);
 userRouter.post("/forgotpassword", forgotPassword);
 userRouter.put("/resetPassword", resetPassword);
+userRouter.put("/uploadProfileImage", multerConfigs.single("profileImage"), uploadProfileImage);
+
 module.exports = userRouter;
