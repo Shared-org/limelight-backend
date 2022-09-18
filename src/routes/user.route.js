@@ -5,6 +5,8 @@ const {
   resetPassword,
   uploadProfileImage,
   updateUserInfo,
+  signIn,
+  getAllUser
 } = require("../controllers/user.controller");
 const multerConfigs = require("../middlewares/multer.middleware");
 const { validateUser } = require("../middlewares/validateUser.middleware");
@@ -82,5 +84,9 @@ userRouter.put(
  *
  */
 userRouter.put("/udpateUserInfo", validateToken, validateUser, updateUserInfo);
+
+userRouter.post("/signIn", signIn);
+
+userRouter.get("/getAllUser", validateToken, getAllUser);
 
 module.exports = userRouter;

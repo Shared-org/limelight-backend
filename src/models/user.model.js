@@ -56,8 +56,17 @@ module.exports = (sequelize, Sequelize) => {
           }
         },
       },
+      instanceMethods: {
+        checkPassword: (password) => {
+          return bcrypt.compareSync(password, this.password);
+        }
+      }
     }
   );
+
+  User.prototype.checkPassword = async (password, hash) => {
+    return await bcrypt.compareSync(password, hash);
+  }
 
   return User;
 };
