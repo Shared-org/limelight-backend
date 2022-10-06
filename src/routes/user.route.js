@@ -85,7 +85,7 @@ userRouter.put(
  */
 userRouter.put("/udpateUserInfo", validateToken, validateUser, updateUserInfo);
 
-userRouter.post("/signIn", signIn);
+userRouter.post("/signin", signIn);
 
 userRouter.get("/getAllUser", validateToken, getAllUser);
 
