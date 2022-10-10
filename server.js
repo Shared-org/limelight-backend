@@ -15,7 +15,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 //* DEFINING ROUTERS *//
 app.use("/api", testRouter);
 app.use("/api", userRouter);
-app.use("/api", postRouter);
+app.use("/api/post", postRouter);
 
 //* TESTING DATABASE CONNECTIVITY *//
 // db.sequelize

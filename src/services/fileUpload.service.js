@@ -1,6 +1,6 @@
 const { s3 } = require("../configs/aws-s3.config");
 const fs = require("fs");
-exports.fileUpload = async (file, BUCKET_NAME) => {
+exports.fileUpload = async (file, BUCKET_NAME, folderName) => {
   try {
     const blob = fs.createReadStream(file.path);
     const uploadedImage = await s3
@@ -9,7 +9,7 @@ exports.fileUpload = async (file, BUCKET_NAME) => {
         Bucket: BUCKET_NAME,
         Key: file.originalFilename,
         Body: blob,
-        Key: `userAvatar/${file.originalname}`,
+        Key: `${folderName}/${file.originalname + new Date()}`,
       })
       .promise();
     // * MAKING "/temp" EMPTY

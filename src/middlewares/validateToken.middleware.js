@@ -12,6 +12,7 @@ exports.validateToken = async (req, res, next) => {
         message:"invalid token"
     })
     req.userEmail = decodedToken?.email;
+    req.userId = decodedToken?.id;
     next();
   } catch (error) {
     return res.status(500).json({ message: "Invalid token" });

@@ -32,7 +32,7 @@ exports.signup = async (req, res) => {
     }
 
     const createUser = await db.User.create(data);
-    const token = await createToken(data.email);
+    const token = await createToken(data.email, createUser.id);
 
     if (createUser) {
       createUser.password = undefined;
@@ -111,12 +111,22 @@ exports.resetPassword = async (req, res) => {
 exports.uploadProfileImage = async (req, res) => {
   try {
     const files = req.file;
-    if (!files) {
+    if (
+      !files ||
+      !files.originalname.includes(".png") ||
+      !files.originalname.includes(".jpg") ||
+      !files.originalname.includes(".gif") ||
+      !files.originalname.includes(".jpeg")
+    ) {
       return res.status(400).json({
         message: "no files/email found",
       });
     }
-    const fileUploadResults = await fileUpload(files, AWS_S3_BUCKET_NAME);
+    const fileUploadResults = await fileUpload(
+      files,
+      AWS_S3_BUCKET_NAME,
+      "userAvatar"
+    );
     if (!fileUploadResults) {
       return res.status(400).json({
         message: "something went wrong while uploading the image",
@@ -178,61 +188,55 @@ exports.updateUserInfo = async (req, res) => {
   }
 };
 
-exports.signIn = async (req, res) =>{
-
+exports.signIn = async (req, res) => {
   try {
     let email = req.body.email;
     let password = req.body.password;
-    if(email && password){
-
+    if (email && password) {
       const user = await getUser(email);
 
-      if(user){
-        const isValidPassword = await user.checkPassword(password, user.password);
+      if (user) {
+        const isValidPassword = await user.checkPassword(
+          password,
+          user.password
+        );
 
         if (!isValidPassword) {
           res.status(401);
           return res.send({ ERROR: { message: "Invalid password" } });
-        }
-        else{
-          const token = await createToken(user.email);
+        } else {
+          const token = await createToken(user.email, user.id);
           res.status(200);
           return res.send({
             message: "user logged in",
             accessToken: token,
           });
         }
-
-      }else{
+      } else {
         res.status(401);
         return res.send({ ERROR: { message: "email not found" } });
       }
-
-    }else{
+    } else {
       res.status(401);
       return res.send({ ERROR: { message: "Missing email or password" } });
     }
-
   } catch (error) {
     console.log("error = ", error);
     res.status(500);
     return res.status.send({ ERROR: { message: "Internal Server Error" } });
   }
-}
+};
 
-exports.getAllUser = async(req, res) =>{
+exports.getAllUser = async (req, res) => {
   try {
-    
     const user = await db.User.findAll();
 
     res.status(200).json({
-      message:user
-    })
+      message: user,
+    });
   } catch (error) {
-    
     res.status(500).json({
-      ERROR: "internal server error"
-    })
+      ERROR: "internal server error",
+    });
   }
-
-}
+};
