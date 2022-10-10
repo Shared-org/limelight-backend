@@ -3,7 +3,8 @@ const { getUser } = require("../services/getUser.service");
 
 exports.validateUser = async (req, res, next) => {
   try {
-    const user = await getUser(req.body.email)
+    const email = req.userEmail || req.body.email;
+    const user = await getUser(email);
     if (user) {
       req.user = user;
       next();

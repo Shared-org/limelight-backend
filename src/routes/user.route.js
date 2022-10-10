@@ -80,13 +80,35 @@ userRouter.put(
  *     description: Used to update the info of user.
  *     responses:
  *     200:
- *       description: {message:"string", userObject}
+ *       description: Success Response
  *
  */
 userRouter.put("/udpateUserInfo", validateToken, validateUser, updateUserInfo);
 
-userRouter.post("/signIn", signIn);
+/**
+ * @swagger
+ * /api/signin:
+ *   post:
+ *     summary: Used for signin
+ *     description: Used to user signin.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+userRouter.post("/signin", signIn);
 
+/**
+ * @swagger
+ * /api/getAllUser:
+ *   put:
+ *     summary: Used for get all user
+ *     description: Used to get all users from user table.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
 userRouter.get("/getAllUser", validateToken, getAllUser);
 
 module.exports = userRouter;
