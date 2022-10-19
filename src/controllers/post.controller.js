@@ -303,3 +303,68 @@ exports.getUserPost = async (req, res) => {
     });
   }
 };
+
+//COMMENT ON POST
+exports.createComment = async (req, res) => {
+  const data = req.body;
+  data["user_id"] = req.userId;
+  try {
+    if (!data.post_id || !data.content) {
+      return res.status(400).json({
+        message: "something went wrong while doing comment",
+      });
+    }
+    const comment = await db.Comment.create(data);
+    if (!comment) {
+      return res.status(400).json({
+        message: "something went wrong while doing comment",
+      });
+    }
+    return res.status(201).json({
+      message: "comment added successfully",
+      comment: comment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+//GET ALL COMMENTS ON POST
+exports.getAllComment = async (req, res) => {
+  const params = req.params;
+  try {
+    if (!params.post_id) {
+      return res.status(400).json({
+        message: "something went wrong while getting comments",
+      });
+    }
+    const comments = await db.Comment.findAll({
+      hierarchy: true,
+      include: [
+        {
+          model: db.User,
+          attributes: ["id", "firstName", "lastName", "profile_image", "email"],
+        },
+      ],
+      where: {
+        post_id: params.post_id,
+      },
+      // TODO: Add pagination here
+    });
+    if (!comments) {
+      return res.status(400).json({
+        message: "something went wrong while fetching comments",
+      });
+    }
+    return res.status(200).json({
+      message: "comment fetched successfully",
+      comment: comments,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
