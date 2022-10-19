@@ -60,8 +60,18 @@ exports.createPost = async (req, res) => {
 //GET SINGLE POST
 exports.getPost = async (req, res) => {
   try {
-    const data = req.body;
-    const post = await db.Post.findByPk(data.id);
+    const data = req.query;
+    const post = await db.Post.findOne({
+      include: [
+        {
+          model: db.Like,
+          attributes: ["user_id"],
+        },
+      ],
+      where: {
+        id: data.postId,
+      },
+    });
     if (!post) {
       return res.status(400).json({
         error: "Something went wrong while retriving the post!!",
@@ -183,7 +193,13 @@ exports.getAllPosts = async (req, res) => {
     if (!page || Number.isNaN(page)) {
       page = 0;
     }
-    const posts = await db.Post.findAndCountAll({
+    const posts = await db.Post.findAll({
+      include: [
+        {
+          model: db.Like,
+          attributes: ["user_id"],
+        },
+      ],
       limit: size,
       offset: page * size,
     });
@@ -194,12 +210,96 @@ exports.getAllPosts = async (req, res) => {
     }
     return res.status(200).json({
       message: "successfully retrived posts",
-      posts: posts?.rows,
-      count: posts?.count,
+      posts: posts,
     });
   } catch (error) {
     return res.status(500).json({
       error: error,
+    });
+  }
+};
+
+// LIKE POST
+exports.likeDislikePost = async (req, res) => {
+  try {
+    const data = req.body;
+    const post = await db.Post.findByPk(data.postId);
+    if (!post) {
+      return res.status(400).json({
+        message: "something went wrong while retriving post",
+      });
+    }
+    const likedPost = await db.Like.findOne({
+      where: {
+        user_id: req.userId,
+        post_id: data.postId,
+      },
+    });
+    if (likedPost) {
+      const disLike = await db.Like.destroy({
+        where: {
+          post_id: data.postId,
+          user_id: req.userId,
+        },
+      });
+      if (!disLike) {
+        return res.status(400).json({
+          message: "something went wrong while disliking post",
+        });
+      }
+      return res.status(200).json({
+        message: "Post disliked successfully",
+        data: disLike,
+      });
+    } else {
+      const like = await db.Like.create({
+        post_id: data.postId,
+        user_id: req.userId,
+      });
+      if (!like) {
+        return res.status(400).json({
+          message: "something went wrong while liking the post",
+        });
+      }
+      return res.status(200).json({
+        message: "Post liked successfully",
+        data: like,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
+// GET ALL USER POST
+exports.getUserPost = async (req, res) => {
+  try {
+    const data = req.body;
+    const userPost = await db.Post.findAll({
+      include: [
+        {
+          model: db.Like,
+          attributes: ["user_id"],
+        },
+      ],
+      where: {
+        userId: data.userId,
+      },
+    });
+    if (!userPost) {
+      return res.status(400).json({
+        message: "something went wrong while retriving posts",
+      });
+    }
+    return res.status(200).json({
+      message: "successfully retrived posts",
+      posts: userPost,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Internal server error",
     });
   }
 };

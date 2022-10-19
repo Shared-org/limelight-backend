@@ -26,6 +26,7 @@ db.sequelize = sequelize;
 
 db.User = require("../models/user.model")(sequelize, Sequelize);
 db.Post = require("../models/post.model")(sequelize, Sequelize);
+db.Like = require("../models/like.model")(sequelize, Sequelize);
 
 
 //Associations
@@ -33,6 +34,13 @@ db.Post.belongsTo(db.User, {
   foreignKey:"userId",
   as:"user_post"
 });
+
 db.User.hasMany(db.Post);
+
+//Like Association
+db.Like.belongsTo(db.User, { foreignKey: "user_id", targetKey: "id" });
+db.Like.belongsTo(db.Post, { foreignKey: "post_id", targetKey: "id" });
+db.Post.hasMany(db.Like, { foreignKey: "post_id", targetKey: "id" });
+db.User.hasMany(db.Like, { foreignKey: "user_id", targetKey: "id" });
 
 module.exports = db;

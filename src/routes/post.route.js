@@ -5,6 +5,8 @@ const {
   deletePost,
   updatePost,
   getAllPosts,
+  likeDislikePost,
+  getUserPost,
 } = require("../controllers/post.controller");
 const multerConfigs = require("../middlewares/multer.middleware");
 const { validateToken } = require("../middlewares/validateToken.middleware");
@@ -88,5 +90,33 @@ postRouter.put(
  *
  */
 postRouter.get("/getAllPost", validateToken, validateUser, getAllPosts);
+
+/**
+ * @swagger
+ * /api/post/like-dislike:
+ *   put:
+ *     summary: Used for make a like to the post
+ *     description: Used for like and dislike the post.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+postRouter.put("/like-dislike", validateToken, validateUser, likeDislikePost);
+
+/**
+ * @swagger
+ * /api/post/userPost:
+ *   get:
+ *     summary: Used for get all user posts
+ *     description: Used for get all post that are done by a user.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+postRouter.get("/userPost", validateToken, validateUser, getUserPost);
+
+
 
 module.exports = postRouter;
