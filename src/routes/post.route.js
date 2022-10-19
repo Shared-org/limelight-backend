@@ -7,6 +7,8 @@ const {
   getAllPosts,
   likeDislikePost,
   getUserPost,
+  createComment,
+  getAllComment,
 } = require("../controllers/post.controller");
 const multerConfigs = require("../middlewares/multer.middleware");
 const { validateToken } = require("../middlewares/validateToken.middleware");
@@ -117,6 +119,31 @@ postRouter.put("/like-dislike", validateToken, validateUser, likeDislikePost);
  */
 postRouter.get("/userPost", validateToken, validateUser, getUserPost);
 
+/**
+ * @swagger
+ * /api/post/comment:
+ *   post:
+ *     summary: Used for comment on a post
+ *     description: Used for comment on any post by current user.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+ postRouter.post("/comment", validateToken, validateUser, createComment);
+
+ /**
+ * @swagger
+ * /api/post/comment:
+ *   get:
+ *     summary: Used for get comment of a post
+ *     description: Used for get all comment on any post by current user.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+  postRouter.get("/comment/:post_id", validateToken, validateUser, getAllComment);
 
 
 module.exports = postRouter;

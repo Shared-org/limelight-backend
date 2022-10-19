@@ -23,7 +23,7 @@ app.use("/api/post", postRouter);
 //   .then(() => console.log("DATABASE CONNECTED..."))
 //   .catch((err) => console.log("ERROR: ", err));
 
-//db.sequelize.sync();
+// db.sequelize.sync();
 
 // * LISTENING TO SERVER
 app.listen(PORT, () => {
