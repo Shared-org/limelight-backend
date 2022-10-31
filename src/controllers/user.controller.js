@@ -206,10 +206,11 @@ exports.signIn = async (req, res) => {
           return res.send({ ERROR: { message: "Invalid password" } });
         } else {
           const token = await createToken(user.email, user.id);
-          res.status(200);
-          return res.send({
+          delete user.dataValues.password;
+          return res.status(200).send({
             message: "user logged in",
             accessToken: token,
+            data: user,
           });
         }
       } else {
@@ -230,13 +231,68 @@ exports.signIn = async (req, res) => {
 exports.getAllUser = async (req, res) => {
   try {
     const user = await db.User.findAll();
-
-    res.status(200).json({
-      message: user,
+    if (!user) {
+      return res.status(400).json({
+        message: "something went wrong while fetching users",
+      });
+    }
+    return res.status(200).json({
+      data: user,
+      message: "users fetched successfully",
     });
   } catch (error) {
-    res.status(500).json({
-      ERROR: "internal server error",
+    return res.status(500).json({
+      error: "internal server error",
+    });
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const data = req.query;
+    if (!data.userId) {
+      return res.status(400).json({
+        message: "user id not found",
+      });
+    }
+    const user = await db.User.findOne({
+      // TODO => Here we need to check follower and following count only
+      // include: [
+      //   {
+      //     model: db.Connection,
+      //     as: "Followee",
+      //     // attributes: ["user_id"],
+      //     where: {
+      //       follower_id: data.userId,
+      //     },
+      //   },
+      //   {
+      //     model: db.Connection,
+      //     as: "Follower",
+      //     // attributes: ["follower_id"],
+      //     where: {
+      //       user_id: data.userId,
+      //     },
+      //   },
+      // ],
+      where: {
+        id: data.userId,
+      },
+    });
+    if (!user) {
+      return res.status(200).json({
+        message: "user not found",
+      });
+    }
+    delete user.dataValues.password;
+    return res.status(200).json({
+      message: "user found",
+      data: user,
+    });
+  } catch (error) {
+    console.log("error => ", error);
+    return res.status(500).json({
+      error: "internal server error",
     });
   }
 };

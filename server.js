@@ -1,6 +1,7 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 const db = require("./src/models/index.js");
+const connectionRouter = require("./src/routes/connection.route.js");
 const postRouter = require("./src/routes/post.route.js");
 const testRouter = require("./src/routes/test.route");
 const userRouter = require("./src/routes/user.route.js");
@@ -16,6 +17,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api", testRouter);
 app.use("/api", userRouter);
 app.use("/api/post", postRouter);
+app.use("/api/connection", connectionRouter);
 
 //* TESTING DATABASE CONNECTIVITY *//
 // db.sequelize

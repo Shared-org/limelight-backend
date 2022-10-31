@@ -29,7 +29,7 @@ db.User = require("../models/user.model")(sequelize, Sequelize);
 db.Post = require("../models/post.model")(sequelize, Sequelize);
 db.Like = require("../models/like.model")(sequelize, Sequelize);
 db.Comment = require("../models/comment.model")(sequelize, Sequelize);
-
+db.Connection = require("../models/connection.model")(sequelize, Sequelize);
 
 //Associations
 db.Post.belongsTo(db.User, {
@@ -50,5 +50,11 @@ db.Comment.belongsTo(db.User, { foreignKey: "user_id", targetKey: "id" });
 db.Comment.belongsTo(db.Post, { foreignKey: "post_id", targetKey: "id" });
 db.Post.hasMany(db.Comment, { foreignKey: "post_id", targetKey: "id" });
 db.User.hasMany(db.Comment, { foreignKey: "user_id", targetKey: "id" });
+
+//Follower Association
+db.Connection.belongsTo(db.User, { foreignKey: "user_id", targetKey: "id" });
+db.Connection.belongsTo(db.User, { foreignKey: "follower_id", targetKey: "id" });
+db.User.hasMany(db.Connection, { foreignKey: "user_id", targetKey: "id" });
+db.User.hasMany(db.Connection, { foreignKey: "follower_id", targetKey: "id" });
 
 module.exports = db;
