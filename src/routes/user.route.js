@@ -6,7 +6,8 @@ const {
   uploadProfileImage,
   updateUserInfo,
   signIn,
-  getAllUser
+  getAllUser,
+  getUser
 } = require("../controllers/user.controller");
 const multerConfigs = require("../middlewares/multer.middleware");
 const { validateUser } = require("../middlewares/validateUser.middleware");
@@ -110,5 +111,18 @@ userRouter.post("/signin", signIn);
  *
  */
 userRouter.get("/getAllUser", validateToken, getAllUser);
+
+/**
+ * @swagger
+ * /api/getUser:
+ *   put:
+ *     summary: Used for get  user
+ *     description: Used to get user from user table.
+ *     responses:
+ *     200:
+ *       description: Success Response
+ *
+ */
+ userRouter.get("/getUser", validateToken, getUser);
 
 module.exports = userRouter;

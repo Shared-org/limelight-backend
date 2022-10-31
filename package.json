@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "migration_init": "npx sequelize-cli model:generate --name User --attributes firstName:string",
     "make_migration": "npx sequelize-cli db:migrate",
+    "undo_migration": "npx sequelize-cli db:migrate:undo",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
